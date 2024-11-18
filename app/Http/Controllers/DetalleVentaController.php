@@ -22,7 +22,7 @@ class DetalleVentaController
 
     public function obtenerDetallesVentaLista(){
         // Obtener todos los clientes
-        $detalles = DatabaseConnection::selectAll('detalleventa');
+        $detalles = DatabaseConnection::selectAll('detalleVenta');
         $listaDetalleVentas = json_decode(json_encode($detalles), true);
         return ($listaDetalleVentas);
 
@@ -32,7 +32,7 @@ class DetalleVentaController
         //Obtener producto actual
         $condicion = ['idVenta' => $id];
 
-        $detalle = DatabaseConnection::selectWithConditions('detalleventa', $condicion);
+        $detalle = DatabaseConnection::selectWithConditions('detalleVenta', $condicion);
         $listaDetalleVentas = json_decode(json_encode($detalle), true);
         // var_dump($detalle);
 
@@ -63,7 +63,7 @@ class DetalleVentaController
 
     //Busca Detalles Para Venta
     public function buscaDetallesVentaId($id){
-        $detalles = DatabaseConnection::selectWithConditions('detalleventa', ['idVenta' => $id]);
+        $detalles = DatabaseConnection::selectWithConditions('detalleVenta', ['idVenta' => $id]);
         $detalles = json_decode(json_encode($detalles), true); 
         return $detalles;
     }
