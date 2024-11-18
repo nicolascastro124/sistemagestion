@@ -17,7 +17,7 @@ const clientes = @json($clientes);
 
 </script>
 
-<script src="{{ mix('resources/js/assets/ventas/functions.js') }}"></script>
+<script src="{{ asset('js/assets/ventas/functions.js') }}"></script>
 
 @vite('resources/js/assets/ventas/modificar.js')
 
