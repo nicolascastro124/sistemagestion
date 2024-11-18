@@ -14,7 +14,7 @@
             <select id="categoryFilter" class="form-select">
                 <option value="">Todos</option>
                 @foreach($categorias as $categoria)
-                    <option value="{{ strtolower($categoria->nombre) }}">{{ $categoria->nombre }}</option>
+                    <option value="{{ strtolower($categoria['nombre']) }}">{{ $categoria['nombre'] }}</option>
                 @endforeach
             </select>
         </div>

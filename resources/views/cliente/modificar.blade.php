@@ -4,10 +4,10 @@
 
 @section('content')
     <br>
-    <form action="{{ route('cliente.actualizar', $cliente['id']) }}"  method="POST">
+    <form action="{{ route('cliente.actualizar', $cliente['rut']) }}"  method="POST">
         @csrf
         @method('PUT')
-        <input class="form-control" type="number" name="id" id="id" value="{{ $cliente['id'] }}" hidden>
+        <input class="form-control" type="number" name="id" id="id" value="{{ $cliente['rut'] }}" hidden>
         <table class="table-light  w-100">
             <tr class="table-light border bg-body-tertiary">
                 <td class="table-light border mx-auto p-3">

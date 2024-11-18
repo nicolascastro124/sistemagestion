@@ -3,6 +3,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\VentaController;
+use App\Http\Controllers\MetodoPagoController;
 
 //Ruta creada por laravel
 Route::get('/', function () {
@@ -42,6 +44,9 @@ Route::delete('/producto/eliminar/{id}', [ProductoController::class, 'eliminarPr
 ->where('id', '[0-9]+')
 ->name('producto.eliminar');
 
+
+Route::get('/producto/lista', [ProductoController::class,'obtenerProductosLista']);
+
 //**************************************************************/
 //Rutas para cliente
 Route::get('/clientes', [ClienteController::class, 'obtenerClientes'])->name('cliente.listaclientes'); // Listo
@@ -61,4 +66,22 @@ Route::delete('/cliente/eliminar/{id}', [ClienteController::class, 'eliminarClie
 //Rutas para Categoria
 Route::get('/categoria/nuevo', [CategoriaController::class, 'nuevaCategoria'])->name('categoria.registrar');
 
+
+//**************************************************************/
+//Rutas para Venta
+Route::get('/ventas', [VentaController::class, 'obtenerVentas'])->name('venta.lista'); //Listo
+Route::get('/ventas/detalle/{id}', [VentaController::class, 'obtenerDetalle'])->name('venta.detalle'); // Listo
+
+Route::get('/ventas/nueva', [VentaController::class, 'nuevaVenta'])->name('venta.registrar');  // Listo
+Route::post('/ventas/agregar', [VentaController::class, 'insertaVenta'])->name('venta.agregar'); // Listo
+Route::delete('/ventas/eliminar/{id}', [VentaController::class, 'eliminarVentaPorId'])  //Listo
+->where('id', '[0-9]+')
+->name('venta.eliminar');
+
+Route::get('/ventas/editar/{id}', [VentaController::class, 'editarVentaVista'])->name('venta.editar'); //Listo
+Route::put('/ventas/actualizar/', [VentaController::class, 'modificarVenta'])->name('venta.actualizar'); //Listo
+
+
+
+Route::get('/metodopago', [MetodoPagoController::class, 'obtenerMetodosPago'])->name('metodopago.lista');
 

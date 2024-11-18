@@ -1,0 +1,13 @@
+@import 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+form {
+    width: 40%; margin: 50px auto; padding: 10px; border-radius: 10px;
+}
+
+input {
+    font-size: 1.1em;
+}

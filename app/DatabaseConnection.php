@@ -45,10 +45,27 @@ class DatabaseConnection
         return DB::table($table)->where($conditions)->first();
     }
 
+    // Método para seleccionar un solo registro basado en condiciones (utilizando strings e ignorando mayusculas/minusculas)
+    public static function selectOneStr($table, $conditions)
+    {
+        $query = DB::table($table);
+
+        foreach($conditions as $column => $value){
+            $query->whereRaw("LOWER($column) = ?",[strtolower($value)]);
+        }
+        return $query->first();
+    }
+
     // Método para insertar registros
     public static function insert($table, $data)
     {
         return DB::table($table)->insert($data);
+    }
+
+    // Método para insertar registros y obtener el último ID insertado
+    public static function insertGetId($table, $data)
+    {
+        return DB::table($table)->insertGetId($data);
     }
 
     // Método para eliminar registros
@@ -62,4 +79,6 @@ class DatabaseConnection
     {
         return DB::table($table)->where($conditions)->update($data);
     }
+
+
 }

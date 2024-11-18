@@ -35,11 +35,11 @@
                     <td>{{ $cliente['rut'] }}-{{ $cliente['dv'] }}</td>
                     <td>{{ $cliente['telefono'] }}</td>
                     <td>
-                        <a href="{{ route('cliente.editar', $cliente['id']) }}" class="btn btn-success">Editar <i class="fa-solid fa-pen"></i></a>
+                        <a href="{{ route('cliente.editar', $cliente['rut']) }}" class="btn btn-success">Editar <i class="fa-solid fa-pen"></i></a>
                     </td>
                     <td>
                         <a href="#" class="btn btn-danger" 
-                           onclick="confirmarEliminacion('{{ route('cliente.eliminar', $cliente['id']) }}'); return false;">
+                           onclick="confirmarEliminacion('{{ route('cliente.eliminar', $cliente['rut']) }}'); return false;">
                             Eliminar <i class="fa-solid fa-trash"></i>
                         </a>
                     </td>

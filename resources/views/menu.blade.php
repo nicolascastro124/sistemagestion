@@ -10,8 +10,8 @@
             Ventas
           </a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#">Ver Ventas</a></li>
-            <li><a class="dropdown-item" href="#">Registrar Ventas</a></li>
+            <li><a class="dropdown-item" href="{{ route('venta.lista')}}">Ver Ventas</a></li>
+            <li><a class="dropdown-item" href="{{ route('venta.registrar')}}">Registrar Ventas</a></li>
           </ul>
         </li>
         <li class="nav-item dropdown">

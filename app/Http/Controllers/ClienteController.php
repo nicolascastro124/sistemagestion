@@ -109,9 +109,9 @@ class ClienteController
     /************************************* */
     //Modificar
     //Funcion para vista modificar
-    public function editarClienteVista ($id){
+    public function editarClienteVista ($rut){
         // Obtener el cliente específico por su ID
-        $cliente = DatabaseConnection::selectOne('cliente', ['id' => $id]);
+        $cliente = DatabaseConnection::selectOne('cliente', ['rut' => $rut]);
         $cliente = json_decode(json_encode($cliente), true); 
         return view('cliente.modificar', ['cliente' => $cliente]);
     }
@@ -128,7 +128,7 @@ class ClienteController
         }  
         // Validaciones manuales
         // Asignar los valores a variables
-        $id = $data['id'];
+        $id = $data['id']; //Rut antes de modificar
         $nombre = $data['nombre'];
         $rut = $data['rut'];
         $telefono = $data['telefono'];
@@ -136,14 +136,13 @@ class ClienteController
         // /**********************************/
         //Preparar Valores para manda
         $data = [
-            'id' => $data['id'],
             'nombre' => $data['nombre'],
             'rut' => $data['rut'],
             'dv' => $this->obtenerDv($rut),
             'telefono' => $data['telefono'],
         ];
         $tabla = 'cliente';
-        $condiciones = ['id' => $id];
+        $condiciones = ['rut' => $id];
 
         //Obtener cliente actual
         $actual = DatabaseConnection::selectOne($tabla, $condiciones);
@@ -186,13 +185,13 @@ class ClienteController
     }
     /************************* */
     //Eliminar
-    public function eliminarClientePorId($id){
-        if (!is_numeric($id)) {
+    public function eliminarClientePorRut($rut){
+        if (!$rut) {
             abort(404); // Lanza un error 404 si el ID no es numérico
         }
         $tabla = 'cliente';
         $data = ['activo' => 0];
-        $condicion = ['id' => $id];
+        $condicion = ['rut' => $rut];
         $deleted = DatabaseConnection::update($tabla, $data, $condicion);
         
         $clientes = $this->obtenerClientesLista();
@@ -221,7 +220,6 @@ class ClienteController
         // validador formulario
         $datos = $request->all();
         $validator = Validator::make($datos, [  
-            'id' => 'numeric',
             'nombre' => 'required|string|max:100',
             'rut' => 'required|string|max:15|min:1',
             'telefono' => 'required|string|max:15|min:1',

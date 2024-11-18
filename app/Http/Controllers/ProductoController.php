@@ -23,9 +23,8 @@ class ProductoController
         $productos = DatabaseConnection::selectWithConditions('producto',$condicion);
         $listaProductos = json_decode(json_encode($productos), true); 
         // Obtener todas las categorías
-        $categorias = DatabaseConnection::selectAll('categoria');
-        $listaCategorias = json_decode(json_encode($categorias), true);
-        
+        $listaCategorias = $this->categoriaController->obtenerCategoriasLista();
+
         $categoriasMap = [];
         foreach ($listaCategorias as $categoria) {
             $categoriasMap[$categoria['id']] = $categoria['nombre'];
@@ -40,12 +39,11 @@ class ProductoController
 
     public function obtenerProductos(){
         // Obtener todos los productos
-        $categorias = DatabaseConnection::selectAll('categoria');
-        $listaCategorias = json_decode(json_encode($categorias), true);
+        $categorias = $this->categoriaController->obtenerCategoriasLista();
         $productos = $this->obtenerProductosLista();
         return view('producto.listaproductos', compact('productos', 'categorias'));
     }
-    /************************************** */
+    
     //Vista Nuevo Producto
     public function nuevoProducto()
     {
@@ -156,9 +154,9 @@ class ProductoController
         $producto = DatabaseConnection::selectOne('producto', ['id' => $id]);
         $producto = json_decode(json_encode($producto), true); 
         // Obtener todas las categorías para el desplegable
-        $categorias = DatabaseConnection::selectAll('categoria');
-        $listaCategorias = json_decode(json_encode($categorias), true);
-        return view('producto.modificar', ['producto' => $producto, 'categorias' => $listaCategorias]);
+        $categorias = $this->categoriaController->obtenerCategoriasLista();
+
+        return view('producto.modificar', ['producto' => $producto, 'categorias' => $categorias]);
     }
 
     public function modificarProducto(Request $request){
@@ -252,13 +250,13 @@ class ProductoController
             abort(404); // Lanza un error 404 si el ID no es numérico
         }
         // eliminar producto por su ID
-        $tabla = 'producto';
-        $data = ['activo' => 0];
-        $condicion = ['id' => $id];
-        $deleted = DatabaseConnection::update($tabla, $data, $condicion);
-
-        $productos = $this->obtenerProductosLista();
-        try{
+        try{      
+            $tabla = 'producto';
+            $data = ['activo' => 0];
+            $condicion = ['id' => $id];
+            $deleted = DatabaseConnection::update($tabla, $data, $condicion);
+    
+            $productos = $this->obtenerProductosLista();
             if ($deleted) {
                 $message = "Producto Eliminado con éxito.";
                 session(['productos' => $productos]);
@@ -299,4 +297,42 @@ class ProductoController
 
         
     }
+
+    //Busca Producto
+
+    public function buscaProductoId($id){
+        $producto = DatabaseConnection::selectOne('producto', ['id' => $id]);
+        $producto = json_decode(json_encode($producto), true); 
+        return $producto;
+    }
+
+    //Actualizar stock
+
+    public function actualizaStock($id,$stock,$cantidad){
+
+        try{
+            $nuevoStock = $stock - $cantidad;
+            if($nuevoStock < 0){
+                $message = "Ocurrio un error al actualizar stock";
+                $url = url()->previous();
+                return view('error', compact('message', 'url'));
+            }
+            $tabla = 'producto';
+            $data = ['stock' => $nuevoStock];
+            $condicion = ['id' => $id];
+            $resultado = DatabaseConnection::update($tabla, $data, $condicion);
+            if ($resultado) {
+                return true;
+            } else {
+                return false;
+            }
+
+        } catch (QueryException $e){
+            $message = "Error de Base datos ".$e;
+            $url = url()->previous();
+            return view('error', compact('message', 'url'));
+        }
+
+    }
+
 }
