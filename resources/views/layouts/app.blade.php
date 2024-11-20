@@ -22,7 +22,7 @@
     @include('menu')
 
     <center>
-        <p class="h1">@yield('maintitle', 'Mi Aplicación')</p>
+        <p class="h2">@yield('maintitle', 'Mi Aplicación')</p>
     </center>
 
     <main>
