@@ -27,9 +27,11 @@
                             <button class="btn btn-success btn-sm me-3" onclick="editUserData({{ json_encode($user) }})">
                                 Editar <i class="fa-solid fa-pen"></i>
                             </button>
+                        @if ($user->id != 1)
                             <button class="btn btn-danger btn-sm" onclick="deleteUser({{ $user->id }})">
                                 Eliminar <i class="fa-solid fa-trash"></i>
                             </button>
+                        @endif
                         </td>
                     </tr>
                 @empty
