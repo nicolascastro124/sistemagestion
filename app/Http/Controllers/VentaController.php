@@ -306,8 +306,10 @@ class VentaController
                 $condicion = ['id' => $idDetalle];
                 $update = $this->detalleVentaController->actualizaDetalleVentaId($data,$idDetalle);
                 $update = $this->productoController->actualizaStock($codigoProducto,$stock,$cantidadDetalle);
+                DB::commit();
 
             }
+            DB::beginTransaction();
 
             // Actualizacion Venta
             $data = [
@@ -327,10 +329,10 @@ class VentaController
                 $url =  route('venta.lista');
                 return view('success',compact('message', 'url'));
             } else {
+                DB::rollBack();
                 $message = "No existen cambios en la Venta";
                 $url = url()->previous();
                 return view('error', compact('message', 'url'));
-                DB::rollBack();
             }
             
 
