@@ -64,7 +64,7 @@ Route::post('/cliente/agregar', [ClienteController::class, 'insertarCliente'])->
 Route::get('/cliente/editar/{id}', [ClienteController::class, 'editarClienteVista'])->name('cliente.editar')->middleware('auth'); //Listo
 Route::put('/cliente/actualizar/', [ClienteController::class, 'modificarCliente'])->name('cliente.actualizar')->middleware('auth'); //Listo
 
-Route::delete('/cliente/eliminar/{id}', [ClienteController::class, 'eliminarClientePorId'])  //Listo
+Route::delete('/cliente/eliminar/{id}', [ClienteController::class, 'eliminarClientePorRut'])  //Listo
 ->where('id', '[0-9]+')
 ->name('cliente.eliminar')
 ->middleware('auth');

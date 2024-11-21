@@ -22,7 +22,8 @@
                     RUT (Sin Digito Verificador)
                 </td>
                 <td class="table-light border mx-auto p-2">
-                    <input class="form-control" type="number" name="rut" id="rut" min=1 value="{{ $cliente['rut'] }}">
+                    <input class="form-control" type="number" name="rut" id="rut" min=1 value="{{ $cliente['rut'] }}" disabled>
+                    <input class="form-control" type="number" name="rut" id="rut" min=1 value="{{ $cliente['rut'] }}" hidden>
                 </td>
             </tr>
             <tr class="table-light border bg-body-tertiary">

@@ -29,82 +29,97 @@ class ClienteController
         return view('cliente.registrar');
     }
 
-    public function insertarCliente(Request $request){
+    public function insertarCliente(Request $request)
+    {
+        // Obtener todos los clientes
         $clientes = $this->obtenerClientesLista();
-        //Validaciones con validador
+    
+        // Validar los datos ingresados
         $data = $this->verificarCliente($request);
-        if(!$data){
-            // Captura los errores y muestra la vista de error
+        if (!$data) {
+            // Si la validación falla
             $message = "Por favor revisa la información ingresada.";
             $url = url()->previous();
             return view('error', compact('message', 'url'));
-        }  
-        // Validaciones manuales
+        }
+    
         // Asignar los valores a variables
         $nombre = $data['nombre'];
         $rut = $data['rut'];
         $telefono = $data['telefono'];
-
-        //Buscar inactivos
-        $condicion = ['activo' => 0];
-        $clientesInactivos = DatabaseConnection::selectWithConditions('cliente',$condicion);
-        $listaInactivos = json_decode(json_encode($clientesInactivos), true);
-        $rutinactivos = array_column($listaInactivos, 'rut');
-
-        if (in_array($rut,$listaInactivos)){
+    
+        // Verificar si el cliente ya existe y está inactivo
+        $clienteInactivo = DatabaseConnection::selectWithConditions('cliente', [
+            'rut' => $rut,
+            'activo' => 0
+        ]);
+    
+        if (!empty($clienteInactivo)) {
+            // Reactivar al cliente inactivo
             $tabla = 'cliente';
-            $data = [
+            $dataUpdate = [
                 'nombre' => $nombre,
-                'rut' => $rut,
                 'telefono' => $telefono,
                 'activo' => 1
             ];
             $condicion = ['rut' => $rut];
-            try{
-                $resultado = DatabaseConnection::update($tabla, $data, $condicion);
+    
+            try {
+                $resultado = DatabaseConnection::update($tabla, $dataUpdate, $condicion);
                 if ($resultado) {
-                    $message = "Cliente se encontraba inactivo (Se ha vuelto a activar)";
+                    $message = "Cliente se encontraba inactivo (Se ha vuelto a activar).";
                     session(['clientes' => $clientes]);
-                    $url =  route('cliente.listaclientes');
-                    return view('success',compact('message', 'url'));
+                    $url = route('cliente.listaclientes');
+                    return view('success', compact('message', 'url'));
                 }
-            }catch (QueryException $e){
-                $message = "Error de Base datos: ".$e;
+            } catch (QueryException $e) {
+                $message = "Error de Base datos: " . $e->getMessage();
                 $url = url()->previous();
-                return view('error', compact('message', 'url')); 
+                return view('error', compact('message', 'url'));
             }
-
         }
-
-        //Verificar si existe por rut
-        $rutclientes = array_column($clientes, 'rut');
-        if (in_array($rut,$rutclientes)){
-            $message = "Cliente ya existe";
+    
+        // Verificar si el cliente ya existe (activo)
+        $clienteExistente = DatabaseConnection::selectWithConditions('cliente', [
+            'rut' => $rut,
+            'activo' => 1
+        ]);
+    
+        if (!empty($clienteExistente)) {
+            $message = "Cliente ya existe.";
             session(['clientes' => $clientes]);
-            $url =  route('cliente.listaclientes');
-            return view('success',compact('message', 'url'));
+            $url = route('cliente.listaclientes');
+            return view('success', compact('message', 'url'));
         }
-
-        //Procedimiento para insert
-        $data = [
-            'nombre' => $data['nombre'],
-            'rut' => $data['rut'],
+    
+        // Insertar un nuevo cliente
+        $dataInsert = [
+            'nombre' => $nombre,
+            'rut' => $rut,
             'dv' => $this->obtenerDv($rut),
-            'telefono' => $data['telefono'],
-
+            'telefono' => $telefono,
+            'activo' => 1 // El cliente se crea como activo
         ];
-        $inserted = DatabaseConnection::insert('cliente', $data);
-        if ($inserted) {
-            $message = "Cliente agregado con éxito.";
-            session(['clientes' => $clientes]);
-            $url =  route('cliente.listaclientes');
-            return view('success',compact('message', 'url'));
-        } else {
-            $message = "Error al agregar Cl.";
+    
+        try {
+            $inserted = DatabaseConnection::insert('cliente', $dataInsert);
+            if ($inserted) {
+                $message = "Cliente agregado con éxito.";
+                session(['clientes' => $clientes]);
+                $url = route('cliente.listaclientes');
+                return view('success', compact('message', 'url'));
+            } else {
+                $message = "Error al agregar el cliente.";
+                $url = url()->previous();
+                return view('error', compact('message', 'url'));
+            }
+        } catch (QueryException $e) {
+            $message = "Error de Base datos: " . $e->getMessage();
             $url = url()->previous();
             return view('error', compact('message', 'url'));
         }
     }
+    
 
     /************************************* */
     //Modificar
@@ -128,7 +143,6 @@ class ClienteController
         }  
         // Validaciones manuales
         // Asignar los valores a variables
-        $id = $data['id']; //Rut antes de modificar
         $nombre = $data['nombre'];
         $rut = $data['rut'];
         $telefono = $data['telefono'];
@@ -142,7 +156,7 @@ class ClienteController
             'telefono' => $data['telefono'],
         ];
         $tabla = 'cliente';
-        $condiciones = ['rut' => $id];
+        $condiciones = ['rut' => $rut];
 
         //Obtener cliente actual
         $actual = DatabaseConnection::selectOne($tabla, $condiciones);
