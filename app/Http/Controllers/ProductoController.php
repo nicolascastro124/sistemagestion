@@ -60,7 +60,7 @@ class ProductoController
         $productos = $this->obtenerProductosLista();
         
         //Validaciones con validador
-        $data = $this->verificarProducto($request);
+        $data = $this->verificarInsertarProducto($request);
         if(!$data){
             // Captura los errores y muestra la vista de error
             $message = "Por favor revisa la información ingresada.";
@@ -295,12 +295,30 @@ class ProductoController
         }
         $data = $validator->validated();
         return $data;
+    
+    }
 
-        
+    //Verificar con validator
+    public function verificarInsertarProducto(Request $request){
+        // validador formulario
+        $datos = $request->all();
+        $validator = Validator::make($datos, [  
+            'nombre' => 'required|string|max:100',
+            'costo' => 'required|numeric|min:1',
+            'precioventa' => 'required|numeric|min:1',
+            'stock' => 'required|numeric|min:0',
+            'fechavenc' => 'required|date|date_format:Y-m-d',
+            'categoria' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return False;
+        }
+        $data = $validator->validated();
+        return $data;
+
     }
 
     //Busca Producto
-
     public function buscaProductoId($id){
         $producto = DatabaseConnection::selectOne('producto', ['id' => $id]);
         $producto = json_decode(json_encode($producto), true); 

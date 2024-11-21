@@ -16,9 +16,9 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/js/app.js', // Archivo principal
-                ...getFilesFromDirectory('resources/js/assets/categoria'), // carpeta ventas
-                ...getFilesFromDirectory('resources/js/assets/ventas'), // carpeta ventas
-                ...getFilesFromDirectory('resources/js/functions/ventas'), // carpeta ventas
+                ...getFilesFromDirectory('resources/js/assets/categoria'), 
+                ...getFilesFromDirectory('resources/js/assets/ventas'), 
+                ...getFilesFromDirectory('resources/js/functions/ventas'),
                 'resources/css/app.css' // CSS
             ],
             refresh: true,
