@@ -7,6 +7,7 @@ use App\Http\Controllers\CategoriaController;
 use Illuminate\Http\Request; 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\QueryException;
+use Carbon\Carbon;
 
 class ProductoController
 {
@@ -334,5 +335,131 @@ class ProductoController
         }
 
     }
+
+    public function productoMasVendido(){
+
+        $sql = "
+        SELECT p.nombre AS producto, SUM(dv.cantidad) AS total_vendido FROM detalleventa dv
+        JOIN 
+            producto p ON dv.idProducto = p.id
+        JOIN 
+            venta v ON dv.idVenta = v.id
+        WHERE v.fecha = ? GROUP BY p.nombre ORDER BY total_vendido DESC LIMIT 1;";
+        $today = Carbon::today(); //Fecha de hoy
+        $fecha = $today->toDateString();
+        $result = DatabaseConnection::executeQuery($sql, [$fecha]);
+
+        // Verificar el resultado
+        if (!empty($result)) {
+            $product = $result[0]; 
+            return $product;
+        } else {
+            return false;
+        }
+    }
+    //Obtener los 5 productos con stock mas bajo
+    public function menorStock(){
+        $sql = "SELECT nombre AS producto, stock FROM producto ORDER BY stock ASC LIMIT 5;";
+        $result = DatabaseConnection::executeQuery($sql, []);
+
+        // Verificar el resultado
+        if (!empty($result)) {
+            $productos = $result; 
+            return $productos;
+        } else {
+            return false;
+        }
+        
+    }
+
+    public function productoEnRango($inicio,$final){
+        $sql = "
+        WITH RECURSIVE fechas AS (SELECT ? AS fecha UNION ALL
+            SELECT DATE_ADD(fecha, INTERVAL 1 DAY)
+            FROM fechas
+            WHERE fecha < ?
+        ),
+        ventas_por_dia AS (
+            SELECT f.fecha, p.nombre AS producto, COALESCE(SUM(dv.cantidad), 0) AS total_vendido, ROW_NUMBER() OVER (PARTITION BY f.fecha ORDER BY SUM(dv.cantidad) DESC) AS fila
+            FROM fechas f
+            LEFT JOIN 
+                venta v ON f.fecha = v.fecha
+            LEFT JOIN 
+                detalleventa dv ON v.id = dv.idVenta
+            LEFT JOIN 
+                producto p ON dv.idProducto = p.id
+            GROUP BY 
+                f.fecha, p.nombre
+        )
+        SELECT fecha, COALESCE(producto, 'No hubo ventas') AS producto, total_vendido
+        FROM ventas_por_dia
+        WHERE fila = 1
+        ORDER BY fecha;";
+
+        $result = DatabaseConnection::executeQuery($sql, [$inicio,$final]);
+
+        // Verificar el resultado
+        if (!empty($result)) {
+            $productos = $result; 
+            return $productos;
+        } else {
+            return false;
+        }
+
+    }
+
+    public function categoriasProductos($inicio,$final){
+        $sql = "
+        SELECT c.nombre AS categoria, 
+        COALESCE(SUM(dv.cantidad), 0) AS cantidad_vendida,
+        COALESCE(SUM(dv.cantidad * p.precioVenta), 0) AS total_ventas
+        FROM categoria c
+        LEFT JOIN 
+            producto p ON c.id = p.idCategoria
+        LEFT JOIN 
+            detalleventa dv ON p.id = dv.idProducto
+        LEFT JOIN 
+            venta v ON dv.idVenta = v.id
+        WHERE 
+            v.fecha BETWEEN ? AND ? OR v.fecha IS NULL
+        GROUP BY c.id, c.nombre ORDER BY total_ventas DESC;";
+
+        $result = DatabaseConnection::executeQuery($sql, [$inicio,$final]);
+
+        // Verificar el resultado
+        if (!empty($result)) {
+            $productos = $result; 
+            return $productos;
+        } else {
+            return false;
+        }
+    }
+
+    public function rentabilidadProductos($inicio,$final){
+        $sql = "
+        SELECT p.nombre AS producto,
+            SUM(dv.cantidad) AS cantidad_vendida,
+            SUM(dv.cantidad * p.costo) AS costo_total,
+            SUM(dv.cantidad * p.precioVenta) AS ingreso_total,
+            SUM(dv.cantidad * (p.precioVenta - p.costo)) AS ganancia_total,
+            ROUND(SUM(dv.cantidad * (p.precioVenta - p.costo)) / NULLIF(SUM(dv.cantidad * p.costo), 0) * 100, 2) AS margen_rentabilidad
+        FROM detalleventa dv
+        JOIN producto p ON dv.idProducto = p.id
+        JOIN venta v ON dv.idVenta = v.id
+        WHERE v.fecha BETWEEN ? AND ?
+        GROUP BY p.id, p.nombre
+        ORDER BY ganancia_total DESC;
+        ";
+        $result = DatabaseConnection::executeQuery($sql, [$inicio,$final]);
+
+        // Verificar el resultado
+        if (!empty($result)) {
+            $productos = $result; 
+            return $productos;
+        } else {
+            return false;
+        }
+    }
+
 
 }

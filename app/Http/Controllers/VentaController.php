@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use GuzzleHttp\Promise\Is;
 
 class VentaController
 {
@@ -203,7 +202,6 @@ class VentaController
         $validator = Validator::make($request->all(), $datos);
     
         if ($validator->fails()) {
-            echo("Fallo en la validacion");
             return false;
         }
         
@@ -263,7 +261,6 @@ class VentaController
         $data = $this->validarModificar($request);
         if (!$data) {
             $message = "Por favor revisa la información ingresada.";
-            echo $message;
             $url = url()->previous();
             return view('error', compact('message', 'url'));
             return redirect()->back()->with('error', 'Error en la validación de los datos.');
@@ -307,10 +304,6 @@ class VentaController
                     'subtotal' => $subtotal,
                 ];
                 $condicion = ['id' => $idDetalle];
-                echo("codigoProducto:".$codigoProducto."<br>");
-                echo("Stock :".$stock."<br>");
-                echo("Cantidad a cambiar :".$cantidadDetalle."<br>");
-                echo("-----------------------<br>");
                 $update = $this->detalleVentaController->actualizaDetalleVentaId($data,$idDetalle);
                 $update = $this->productoController->actualizaStock($codigoProducto,$stock,$cantidadDetalle);
 
@@ -375,6 +368,61 @@ class VentaController
         
         $data = $validator->validated();
         return $data;
+    }
+
+    public function cantidadVentasHoy(){
+
+        $sql = "
+        SELECT 
+            COUNT(*) AS cantidad_ventas_hoy,
+            SUM(totalVenta) AS total_ventas_hoy
+        FROM 
+            venta
+        WHERE 
+            fecha = ?;
+        ";
+        $today = Carbon::today(); //Fecha de hoy
+        $fecha = $today->toDateString();
+        $result = DatabaseConnection::executeQuery($sql, [$fecha]);
+
+        // Verificar el resultado
+        if (!empty($result)) {
+            $venta = $result[0]; 
+            return $venta;
+        } else {
+            return false;
+        }
+    }
+
+    public function ventasPorDia($inicio,$final){
+        $sql = "
+        WITH RECURSIVE fechas AS (
+            SELECT ? AS fecha
+            UNION ALL
+            SELECT DATE_ADD(fecha, INTERVAL 1 DAY)
+            FROM fechas
+            WHERE fecha < ?
+        )
+        SELECT f.fecha, COALESCE(SUM(v.totalVenta), 0) AS total_ventas_diarias, COALESCE(COUNT(v.id), 0) AS cantidad_ventas_diarias
+        FROM 
+            fechas f
+        LEFT JOIN 
+            venta v ON f.fecha = v.fecha AND v.activo = 1
+        GROUP BY 
+            f.fecha
+        ORDER BY 
+            f.fecha;
+        ";
+
+        $result = DatabaseConnection::executeQuery($sql, [$inicio,$final]);
+
+        // Verificar el resultado
+        if (!empty($result)) {
+            $ventas = $result; 
+            return $ventas;
+        } else {
+            return false;
+        }
     }
 }
 

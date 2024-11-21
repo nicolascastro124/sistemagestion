@@ -5,8 +5,11 @@ use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\VentaController;
 use App\Http\Controllers\MetodoPagoController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\InfoController;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\AuthController;
+use App\Models\MetodoPago;
 
 //Ruta creada por laravel
 
@@ -48,6 +51,10 @@ Route::delete('/producto/eliminar/{id}', [ProductoController::class, 'eliminarPr
 
 Route::get('/producto/lista', [ProductoController::class,'obtenerProductosLista'])->middleware('auth');
 
+Route::get('/producto/categorias', [CategoriaController::class,'obtenerCategoriasLista'])->name('producto.categorias')->middleware('auth');
+Route::get('/producto/categoria/nuevo', [CategoriaController::class,'nuevaCategoria'])->name('producto.nuevacategoria')->middleware('auth');
+Route::post('/producto/categoria/nuevo', [CategoriaController::class,'ingresarNuevaCategoria'])->name('producto.ingresarcategoria')->middleware('auth');
+
 //**************************************************************/
 //Rutas para cliente
 Route::get('/clientes', [ClienteController::class, 'obtenerClientes'])->name('cliente.listaclientes')->middleware('auth'); // Listo
@@ -86,7 +93,9 @@ Route::put('/ventas/actualizar/', [VentaController::class, 'modificarVenta'])->n
 
 
 
-Route::get('/metodopago', [MetodoPagoController::class, 'obtenerMetodosPago'])->name('metodopago.lista')->middleware('auth');
+Route::get('/ventas/metodospago', [MetodoPagoController::class,'obtenerMetodosPagoLista'])->name('venta.metodospago')->middleware('auth');
+Route::get('/ventas/metodospago/nuevo', [MetodoPagoController::class,'nuevoMetodo'])->name('venta.nuevometodo')->middleware('auth');
+Route::post('/ventas/metodospago/nuevo', [MetodoPagoController::class,'ingresarNuevoMetodo'])->name('venta.ingresarmetodo')->middleware('auth');
 
 //**************************************************************/
 
@@ -109,23 +118,29 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // requiere autenticación
 Route::middleware('auth')->group(function () {
-    Route::get('/', function () {
-        return view('welcome');
-    })->name('welcome');
-
+    Route::get('/', [HomeController::class, 'welcome'])->name('welcome');
 });
 
 // formulario de registro
-Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register')->middleware('auth');
 
 // procesar registro
-Route::post('/register', [AuthController::class, 'register']);
+Route::post('/register', [AuthController::class, 'register'])->middleware('auth');
 
-// procesar registro
-Route::post('/register', [AuthController::class, 'register']);
 
 //**************************************************************/
 //Rutas para usuarios
 Route::get('/users', [AuthController::class, 'usersList'])->name('users')->middleware('auth');
 Route::put('/users/{id}', [AuthController::class, 'update'])->name('users.update')->middleware('auth');
 Route::put('/users/eliminar/{id}', [AuthController::class, 'deactivate'])->name('users.deactivate')->middleware('auth');
+
+//**************************************************************/
+//Rutas para informes
+Route::get('/ventasfecha', [InfoController::class, 'ventasFecha'])->name('info.ventasfecha')->middleware('auth');
+Route::post('/ventasfecha', [InfoController::class, 'ventasFechaGenerar'])->name('info.ventasfechagenerar')->middleware('auth');
+
+Route::get('/categoriaproductos', [InfoController::class, 'categoriaProductos'])->name('info.categoriaproductos')->middleware('auth');
+Route::post('/categoriaproductos', [InfoController::class, 'categoriaProductosGenerar'])->name('info.categoriaproductosgenerar')->middleware('auth');
+
+Route::get('/rentabilidadproductos', [InfoController::class, 'rentabilidadProductos'])->name('info.rentabilidadproductos')->middleware('auth');
+Route::post('/rentabilidadproductos', [InfoController::class, 'rentabilidadProductosGenerar'])->name('info.rentabilidadproductosgenerar')->middleware('auth');

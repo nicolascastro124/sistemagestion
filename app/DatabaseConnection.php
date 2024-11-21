@@ -3,6 +3,8 @@
 namespace App;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 use Dotenv\Dotenv;
 
 class DatabaseConnection
@@ -80,5 +82,15 @@ class DatabaseConnection
         return DB::table($table)->where($conditions)->update($data);
     }
 
+    //Metodo para consultas sql
+    public static function executeQuery($sql, $bindings = [])
+    {
+        try {
+            return DB::select($sql, $bindings);
+        } catch (\Exception $e) {
+            Log::error("Error en la consulta SQL: " . $e->getMessage());
+            return response()->json(['error' => 'Error al ejecutar la consulta SQL.'], 500);
+        }
+    }
 
 }

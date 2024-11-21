@@ -3,71 +3,68 @@
 namespace App\Http\Controllers;
 
 use App\DatabaseConnection;
-use App\Models\MetodoPago;
-use Illuminate\Http\Request; 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 
 class MetodoPagoController
 {
-
     public function obtenerMetodosPagoLista(){
-        // Obtener todos los clientes
-        $metodopago = DatabaseConnection::selectAll('metodopago');
-        $listaMetodos = json_decode(json_encode($metodopago), true);
+        // Obtener todos las categorias
+        $metodospago = DatabaseConnection::selectAll('metodopago');
+        $listaMetodos = json_decode(json_encode($metodospago), true);
         return ($listaMetodos);
-
     }
-    public function insertarMetodoPago(Request $request){
-        $metodopago = $this->obtenerMetodosPagoLista();
+
+    public function nuevoMetodo(){
+        return view('venta.nuevometodo');
+    }
+
+    public function ingresarNuevoMetodo(Request $request){
 
         //Validaciones con validador
-        $data = $this->verificarMetodoPago($request);
+        $data = $this->verificarMetodo($request);
         if(!$data){
             // Captura los errores y muestra la vista de error
             $message = "Por favor revisa la información ingresada.";
             $url = url()->previous();
             return view('error', compact('message', 'url'));
         }
-        // Validaciones manuales
-        $descripcion = $data['des'];
 
-        // verificar si existe por nombre
-        $descripcionMetodo = array_column($descripcion, 'descripcion');
-        $descripcionMetodo = array_map('strtolower', $descripcionMetodo);
+        $descripcion = $data['descripcion'];
 
-        $tabla = 'metodopago';
-        $condicion = ['descripcion' => $descripcion];
-        $resultado = DatabaseConnection::selectOneStr($tabla, $condicion);
-        if (isset($resultado)){
-            $message = "Metodo de Pago ya existe";
-            $url = url()->previous();
-            return view('error', compact('message', 'url'));
-        }
-        /**********************************/
+        try{
 
-        $data = [
-            'descripcion' => $data['des'],
-        ];
-        // Llamar a insert para agregar un producto a la tabla
-        $inserted = DatabaseConnection::insert('metodopago', $data);
-        if ($inserted) {
-            $message = "Metodo de Pago agregado con éxito.";
-            $url = url()->previous();
+            // Verificar si la categoría ya existe
+            $categoriaExistente = DB::table('metodopago')->where('descripcion', $descripcion)->first();
+
+            if ($categoriaExistente) {
+                $message = "El metodo de pago con el nombre '{$descripcion}' ya existe.";
+                $url = url()->previous();
+                return view('error', compact('message', 'url'));
+            }
+
+            // Llamar a insert para agregar un producto a la tabla
+            $inserted = DatabaseConnection::insert('metodopago', $data);
+
+            $message = 'Metodo Pago agregado exitosamente.';
+            $url =  route('welcome');
             return view('success',compact('message', 'url'));
-        } else {
-            $message = "Error al agregar Metodo de Pago.";
+
+        } catch (QueryException $e){
+            $message = "Error de Base datos: ".$e;
             $url = url()->previous();
-            return view('error', compact('message', 'url'));
+            return view('error', compact('message', 'url')); 
         }
 
     }
 
-    //Verificar con validator
-    public function verificarMetodoPago(Request $request){
+    public function verificarMetodo(Request $request){
         // validador formulario
         $datos = $request->all();
         $validator = Validator::make($datos, [  
-            'descripcion' => 'required|string|max:50',
+            'descripcion' => 'required|string|max:100',
         ]);
 
     
@@ -76,8 +73,7 @@ class MetodoPagoController
         }
         $data = $validator->validated();
         return $data;
+
         
     }
-
-
 }
