@@ -274,7 +274,6 @@ class VentaController
         $detalles = $data['detalles'];
         $totalVenta = 0;
         //Proceso Bd
-        DB::beginTransaction();
         try{
             //Obtener datos de detalles venta
             foreach ($detalles as $detalle){
@@ -306,10 +305,8 @@ class VentaController
                 $condicion = ['id' => $idDetalle];
                 $update = $this->detalleVentaController->actualizaDetalleVentaId($data,$idDetalle);
                 $update = $this->productoController->actualizaStock($codigoProducto,$stock,$cantidadDetalle);
-                DB::commit();
 
             }
-            DB::beginTransaction();
 
             // Actualizacion Venta
             $data = [
@@ -324,12 +321,10 @@ class VentaController
             $resultado = DatabaseConnection::update($tabla, $data, $condicion);
             //Verificacion resultado
             if ($resultado) {
-                DB::commit();
                 $message = "Venta Actualizada con éxito.";
                 $url =  route('venta.lista');
                 return view('success',compact('message', 'url'));
             } else {
-                DB::rollBack();
                 $message = "No existen cambios en la Venta";
                 $url = url()->previous();
                 return view('error', compact('message', 'url'));
@@ -337,7 +332,6 @@ class VentaController
             
 
         }catch (QueryException $e){
-            DB::rollBack();
             $message = "Error de Base datos: ".$e;
             $url = url()->previous();
             return view('error', compact('message', 'url')); 
