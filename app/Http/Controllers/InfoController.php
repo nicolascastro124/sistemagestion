@@ -60,6 +60,14 @@ class InfoController
         $fechaInicio = $data['fechaInicio'];
         $fechaFin = $data['fechaTermino'];
 
+        // Comparar las fechas
+        if (strtotime($fechaFin) < strtotime($fechaInicio)) {
+            // Redirigir de vuelta con un mensaje de error
+            return redirect()->back()->withErrors([
+                'fechaTermino' => 'La fecha de término debe ser mayor o igual a la fecha de inicio.',
+            ])->withInput();
+        }
+
         $totales = $this->ventaController->ventasPorDia($fechaInicio,$fechaFin);
         $productos = $this->productoController->productoEnRango($fechaInicio,$fechaFin);
 
@@ -168,6 +176,14 @@ class InfoController
         $fechaInicio = $data['fechaInicio'];
         $fechaFin = $data['fechaTermino'];
 
+        // Comparar las fechas
+        if (strtotime($fechaFin) < strtotime($fechaInicio)) {
+            // Redirigir de vuelta con un mensaje de error
+            return redirect()->back()->withErrors([
+                'fechaTermino' => 'La fecha de término debe ser mayor o igual a la fecha de inicio.',
+            ])->withInput();
+        }
+
         $productos = $this->productoController->categoriasProductos($fechaInicio,$fechaFin);
 
         // Crear el archivo Excel
@@ -270,6 +286,14 @@ class InfoController
         }
         $fechaInicio = $data['fechaInicio'];
         $fechaFin = $data['fechaTermino'];
+
+        // Comparar las fechas
+        if (strtotime($fechaFin) < strtotime($fechaInicio)) {
+            // Redirigir de vuelta con un mensaje de error
+            return redirect()->back()->withErrors([
+                'fechaTermino' => 'La fecha de término debe ser mayor o igual a la fecha de inicio.',
+            ])->withInput();
+        }
 
         $productos = $this->productoController->rentabilidadProductos($fechaInicio,$fechaFin);
 
