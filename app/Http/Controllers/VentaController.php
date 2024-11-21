@@ -375,7 +375,7 @@ class VentaController
         FROM 
             venta
         WHERE 
-            fecha = ?;
+            fecha = ? AND activo = 1;
         ";
         $today = Carbon::today(); //Fecha de hoy
         $fecha = $today->toDateString();

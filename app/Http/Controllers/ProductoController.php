@@ -362,7 +362,8 @@ class ProductoController
             producto p ON dv.idProducto = p.id
         JOIN 
             venta v ON dv.idVenta = v.id
-        WHERE v.fecha = ? GROUP BY p.nombre ORDER BY total_vendido DESC LIMIT 1;";
+        WHERE v.fecha = ? AND v.activo = 1
+        GROUP BY p.nombre ORDER BY total_vendido DESC LIMIT 1;";
         $today = Carbon::today(); //Fecha de hoy
         $fecha = $today->toDateString();
         $result = DatabaseConnection::executeQuery($sql, [$fecha]);
