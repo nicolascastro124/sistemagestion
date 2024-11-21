@@ -16,5 +16,35 @@
         </center>
 </form>
 
+@if ($errors->any())
+    <div class="alert alert-danger mt-3">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
+<script>
+    function validarFechas(event) {
+        const fechaInicio = document.getElementById('fechaInicio').value;
+        const fechaTermino = document.getElementById('fechaTermino').value;
+
+        // Verificar si ambas fechas están llenas
+        if (!fechaInicio || !fechaTermino) {
+            alert('Por favor, selecciona ambas fechas.');
+            return false;
+        }
+
+        // Comparar fechas
+        if (new Date(fechaTermino) < new Date(fechaInicio)) {
+            alert('La fecha de término debe ser mayor o igual a la fecha de inicio.');
+            return false; 
+        }
+
+        return true; 
+    }
+</script>
 
 @endsection
