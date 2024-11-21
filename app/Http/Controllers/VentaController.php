@@ -193,14 +193,14 @@ class VentaController
             'fechaVenta' => 'required|date',
             'hora' => 'required|date_format:H:i',
             'metodoPago' => 'required|string',
-            'clienteRut' => 'numeric',
+            'clienteRut' => 'nullable|numeric',
             'detalles' => 'required|array',
             'detalles.*.codigo_producto' => 'required|string',
             'detalles.*.cantidad' => 'required|numeric',
         ];
+
         // Ejecuta la validación
         $validator = Validator::make($request->all(), $datos);
-    
         if ($validator->fails()) {
             return false;
         }
