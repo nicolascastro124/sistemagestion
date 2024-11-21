@@ -193,7 +193,7 @@ class VentaController
             'fechaVenta' => 'required|date',
             'hora' => 'required|date_format:H:i',
             'metodoPago' => 'required|string',
-            'clienteRut' => 'required|numeric',
+            'clienteRut' => 'numeric',
             'detalles' => 'required|array',
             'detalles.*.codigo_producto' => 'required|string',
             'detalles.*.cantidad' => 'required|numeric',
