@@ -69,7 +69,7 @@ class DetalleVentaController
     }
 
     public function actualizaDetalleVentaId($data,$idDetalle){
-        $tabla = 'detalleVenta';
+        $tabla = 'detalleventa';
         $condicion = ['id' => $idDetalle];
         try{
             $resultado = DatabaseConnection::update($tabla, $data, $condicion);
