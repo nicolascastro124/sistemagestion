@@ -42,14 +42,20 @@
                     Rut Cliente (Sin DV)
                 </td>
                 <td class="table-light border mx-auto p-2">
-                    <div class="row">
-                        <div class="col">
-                            <input type="number" class="form-control" name="clienteRut" id="clienteRut" min=0 placeholder="Ingrese Rut">
-                        </div>
-                        <div class="col">
-                            <input type="text" class="form-control" name="clienteNombre" id="clienteNombre" placeholder="Nombre" disabled>
-                        </div>
+                <div class="row">
+                    <div class="col-4">
+                        <input type="number" class="form-control" name="clienteRut" id="clienteRut" min="0" placeholder="Ingrese Rut">
                     </div>
+                    <div class="col-5">
+                        <input type="text" class="form-control form-control" name="clienteNombre" id="clienteNombre" placeholder="Nombre" disabled>
+                    </div>
+                    <div class="col-2 d-flex align-items-center">
+                        <input type="hidden" name="anonimo" value="0">
+                        <input type="checkbox" class="form-check-input me-2" id="anonimo" name="anonimo" value="1">
+                        <label class="form-check-label mb-0" for="anonimo">Anónimo</label>
+                    </div>
+                </div>
+
                 </td>
 
             </tr>

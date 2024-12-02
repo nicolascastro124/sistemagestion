@@ -62,9 +62,14 @@ class VentaController
         }
         // Añadir el nombre de cliente a las ventas
         foreach ($listaVentas as &$venta) {
-            $venta['nombreCliente'] = $clientesMap[$venta['rutCliente']] ?? 'Sin Descripcion';
+            if (is_null($venta['rutCliente'])) {
+                $venta['nombreCliente'] = 'Sin Descripción';
+            } else {
+                // Si no es null, buscar el nombre del cliente
+                $venta['nombreCliente'] = $clientesMap[$venta['rutCliente']] ?? 'Sin Descripción';
+            }
+
         }
-        
         return ($listaVentas);
 
     }
@@ -117,7 +122,10 @@ class VentaController
         $metodoPago = $data['metodoPago'];
         $clienteRut = $data['clienteRut'];
         $detalles = $data['detalles'];
-        
+        $anonimo = $data['anonimo'];
+        if ($anonimo == 0) {
+            $clienteRut = '';
+        }
         
         //Calcular total
         $totalVenta = 0;
@@ -194,6 +202,7 @@ class VentaController
             'hora' => 'required|date_format:H:i',
             'metodoPago' => 'required|string',
             'clienteRut' => 'nullable|numeric',
+            'anonimo' => 'nullable|boolean', 
             'detalles' => 'required|array',
             'detalles.*.codigo_producto' => 'required|string',
             'detalles.*.cantidad' => 'required|numeric',
@@ -206,6 +215,11 @@ class VentaController
         }
         
         $data = $validator->validated();
+
+        if (!isset($data['clienteRut']) || $data['clienteRut'] === null) {
+            $data['clienteRut'] = ''; 
+        }
+
         return $data;
     }
 

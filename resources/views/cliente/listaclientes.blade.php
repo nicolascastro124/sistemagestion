@@ -30,6 +30,7 @@
         </thead>
         <tbody id="clientesTable">
             @foreach($clientes as $cliente)
+                @if($cliente['rut'] != '' &&  $cliente['nombre'] != '' && $cliente['telefono'] != '')
                 <tr>
                     <td>{{ $cliente['nombre'] }}</td>
                     <td>{{ $cliente['rut'] }}-{{ $cliente['dv'] }}</td>
@@ -44,6 +45,7 @@
                         </a>
                     </td>
                 </tr>
+                @endif
             @endforeach
         </tbody>
     </table>

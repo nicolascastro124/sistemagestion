@@ -232,5 +232,24 @@ const clienteRut = document.getElementById('clienteRut');
 const nombreCliente = document.getElementById('clienteNombre');
 clienteRut.addEventListener('input', function() {
     const nombre = getClientNameByRut(clienteRut.value);
-    nombreCliente.value = nombre;
+    if(nombre != 'Anonimo'){
+        nombreCliente.value = nombre;
+    }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const anonimoCheckbox = document.getElementById("anonimo");
+    const clienteRutInput = document.getElementById("clienteRut");
+
+    function toggleRutField() {
+        if (anonimoCheckbox.checked) {
+            clienteRutInput.value = ""; 
+            clienteRutInput.disabled = true; // Deshabilita el campo Rut
+        } else {
+            clienteRutInput.disabled = false; // Habilita el campo Rut
+        }
+    }
+
+    anonimoCheckbox.addEventListener("change", toggleRutField);
+    toggleRutField();
 });
