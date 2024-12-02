@@ -25,7 +25,7 @@
             <li><a class="dropdown-item" href="{{ route('producto.listaproductos')}}">Ver Productos</a></li>
             <li><a class="dropdown-item" href="{{ route('producto.registrar')}}">Registrar Productos</a></li>
             <li><a class="dropdown-item" href="{{ route('producto.nuevacategoria')}}">Nueva Categoria Producto</a></li>
-
+            <li><a class="dropdown-item" href="{{ route('producto.agregarStock.vista')}}">Agregar Stock</a></li>
           </ul>
         </li>
         <li class="nav-item dropdown">

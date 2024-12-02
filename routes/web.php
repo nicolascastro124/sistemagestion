@@ -55,6 +55,10 @@ Route::get('/producto/categorias', [CategoriaController::class,'obtenerCategoria
 Route::get('/producto/categoria/nuevo', [CategoriaController::class,'nuevaCategoria'])->name('producto.nuevacategoria')->middleware('auth');
 Route::post('/producto/categoria/nuevo', [CategoriaController::class,'ingresarNuevaCategoria'])->name('producto.ingresarcategoria')->middleware('auth');
 
+Route::get('/producto/agregar-stock', [ProductoController::class, 'agregarStockVista'])->name('producto.agregarStock.vista')->middleware('auth');
+Route::post('/producto/agregar-stock', [ProductoController::class, 'agregarStock'])->name('producto.agregarStock')->middleware('auth');
+
+
 //**************************************************************/
 //Rutas para cliente
 Route::get('/clientes', [ClienteController::class, 'obtenerClientes'])->name('cliente.listaclientes')->middleware('auth'); // Listo

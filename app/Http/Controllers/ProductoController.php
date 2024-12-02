@@ -353,6 +353,63 @@ class ProductoController
 
     }
 
+    public function agregarStockVista(Request $request){
+        $productos = $this->obtenerProductosLista();
+        return view('producto.agregarstock', compact('productos'));
+    }
+
+    public function agregarStock(Request $request)
+    {
+        // Validar los datos del formulario
+        $validated = Validator::make($request->all(), [
+            'producto' => 'required|numeric', // Verifica que el producto existe
+            'cantidad' => 'required|numeric|min:1',        // Verifica que la cantidad sea positiva
+        ]);
+    
+        if ($validated->fails()) {
+            $message = "Datos inválidos. Por favor revisa la información ingresada.";
+            $url = url()->previous();
+            return view('error', compact('message', 'url'));
+        }
+    
+        $data = $validated->validated();
+        // Obtener el producto actual por ID
+        $producto = $this->buscaProductoId($data['producto']); // Método ya existente en tu controlador
+    
+        if (!$producto) {
+            $message = "El producto no existe.";
+            $url = url()->previous();
+            return view('error', compact('message', 'url'));
+        }
+    
+        // Calcular el nuevo stock
+        $nuevoStock = $producto['stock'] + $data['cantidad'];
+    
+        // Actualizar el stock en la base de datos
+        $tabla = 'producto';
+        $condicion = ['id' => $data['producto']];
+        $actualizacion = ['stock' => $nuevoStock];
+    
+        try {
+            $resultado = DatabaseConnection::update($tabla, $actualizacion, $condicion);
+    
+            if ($resultado) {
+                $message = "Stock actualizado correctamente.";
+                $url = route('producto.listaproductos'); // Redirigir a la lista de productos
+                return view('success', compact('message', 'url'));
+            } else {
+                $message = "Error al actualizar el stock.";
+                $url = url()->previous();
+                return view('error', compact('message', 'url'));
+            }
+        } catch (QueryException $e) {
+            $message = "Error de base de datos: " . $e->getMessage();
+            $url = url()->previous();
+            return view('error', compact('message', 'url'));
+        }
+    }
+    
+
     public function productoMasVendido(){
 
         $sql = "
