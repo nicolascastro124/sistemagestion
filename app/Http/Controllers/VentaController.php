@@ -123,7 +123,7 @@ class VentaController
         $clienteRut = $data['clienteRut'];
         $detalles = $data['detalles'];
         $anonimo = $data['anonimo'];
-        if ($anonimo == 0) {
+        if ($anonimo == 1) {
             $clienteRut = '';
         }
         
