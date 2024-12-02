@@ -326,7 +326,6 @@ class ProductoController
     }
 
     //Actualizar stock
-
     public function actualizaStock($id,$stock,$cantidad){
 
         try{
@@ -413,7 +412,7 @@ class ProductoController
         SELECT fecha, COALESCE(producto, 'No hubo ventas') AS producto, total_vendido
         FROM ventas_por_dia
         WHERE fila = 1
-        ORDER BY fecha;";
+        ORDER BY fecha DESC;";
 
         $result = DatabaseConnection::executeQuery($sql, [$inicio,$final]);
 
@@ -479,6 +478,8 @@ class ProductoController
             return false;
         }
     }
+
+
 
 
 }

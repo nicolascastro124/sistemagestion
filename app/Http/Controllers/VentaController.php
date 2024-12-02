@@ -372,7 +372,7 @@ class VentaController
         $validator = Validator::make($request->all(), $datos);
     
         if ($validator->fails()) {
-            dd($validator->errors()->all());
+            // dd($validator->errors()->all());
             return false;
         }
         
@@ -421,7 +421,7 @@ class VentaController
         GROUP BY 
             f.fecha
         ORDER BY 
-            f.fecha;
+            f.fecha DESC;
         ";
 
         $result = DatabaseConnection::executeQuery($sql, [$inicio,$final]);

@@ -138,9 +138,12 @@ Route::put('/users/eliminar/{id}', [AuthController::class, 'deactivate'])->name(
 //Rutas para informes
 Route::get('/ventasfecha', [InfoController::class, 'ventasFecha'])->name('info.ventasfecha')->middleware('auth');
 Route::post('/ventasfecha', [InfoController::class, 'ventasFechaGenerar'])->name('info.ventasfechagenerar')->middleware('auth');
+Route::post('/ventasfechaExcel', [InfoController::class, 'ventasFechaGenerarExcel'])->name('info.ventasfecha.excel')->middleware('auth');
 
 Route::get('/categoriaproductos', [InfoController::class, 'categoriaProductos'])->name('info.categoriaproductos')->middleware('auth');
 Route::post('/categoriaproductos', [InfoController::class, 'categoriaProductosGenerar'])->name('info.categoriaproductosgenerar')->middleware('auth');
+Route::post('/categoriaproductosExcel', [InfoController::class, 'categoriaProductosGenerarExcel'])->name('info.categoriaproductos.excel')->middleware('auth');
 
 Route::get('/rentabilidadproductos', [InfoController::class, 'rentabilidadProductos'])->name('info.rentabilidadproductos')->middleware('auth');
 Route::post('/rentabilidadproductos', [InfoController::class, 'rentabilidadProductosGenerar'])->name('info.rentabilidadproductosgenerar')->middleware('auth');
+Route::post('/rentabilidadproductosExcel', [InfoController::class, 'rentabilidadProductosGenerarExcel'])->name('info.rentabilidadproductos.excel')->middleware('auth');

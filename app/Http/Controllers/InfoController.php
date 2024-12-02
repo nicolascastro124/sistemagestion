@@ -48,8 +48,39 @@ class InfoController
     public function ventasFecha(){
         return view('info.ventasfecha');
     }
-    public function ventasFechaGenerar(Request $request){
 
+    public function ventasFechaGenerar(Request $request) {
+        // Verificar con validator
+        $data = $this->validarFechas($request);
+        if (!$data) {
+            $message = "Error en Fechas ingresadas";
+            $url = url()->previous();
+            return view('error', compact('message', 'url'));
+        }
+        $fechaInicio = $data['fechaInicio'];
+        $fechaFin = $data['fechaTermino'];
+    
+        // Comparar las fechas
+        if (strtotime($fechaFin) < strtotime($fechaInicio)) {
+            return redirect()->back()->withErrors([
+                'fechaTermino' => 'La fecha de término debe ser mayor o igual a la fecha de inicio.',
+            ])->withInput();
+        }
+    
+        // Obtener datos de ventas y productos
+        $totales = $this->ventaController->ventasPorDia($fechaInicio, $fechaFin);
+        $productos = $this->productoController->productoEnRango($fechaInicio, $fechaFin);
+        // Combinar datos
+        foreach ($totales as $index => $total) {
+            $totales[$index]->producto_mas_vendido = $productos[$index]->producto ?? 'No hubo ventas';
+            $totales[$index]->cantidad_venta_producto = $productos[$index]->total_vendido ?? 0;
+        }
+
+        return view('info.ventasfecharesult', compact('fechaInicio', 'fechaFin', 'totales'));
+    }
+    
+
+    public function ventasFechaGenerarExcel(Request $request){
         //Verificar con validator
         $data = $this->validarFechas($request);
         if (!$data) {
@@ -161,11 +192,36 @@ class InfoController
         
     }
 
+    /************************************************************************************************************************ */
     public function categoriaProductos(){
         return view('info.productoscategoria');
     }
 
     public function categoriaProductosGenerar(Request $request){
+        //Verificar con validator
+        $data = $this->validarFechas($request);
+        if (!$data) {
+            $message = "Error en Fechas ingresadas";
+            $url = url()->previous();
+            return view('error', compact('message', 'url'));
+        }
+        $fechaInicio = $data['fechaInicio'];
+        $fechaFin = $data['fechaTermino'];
+
+        // Comparar las fechas
+        if (strtotime($fechaFin) < strtotime($fechaInicio)) {
+            // Redirigir de vuelta con un mensaje de error
+            return redirect()->back()->withErrors([
+                'fechaTermino' => 'La fecha de término debe ser mayor o igual a la fecha de inicio.',
+            ])->withInput();
+        }
+
+        $productos = $this->productoController->categoriasProductos($fechaInicio,$fechaFin);
+        return view('info.productoscategoriaresult', compact('fechaInicio', 'fechaFin', 'productos'));
+    }
+
+
+    public function categoriaProductosGenerarExcel(Request $request){
         //Verificar con validator
         $data = $this->validarFechas($request);
         if (!$data) {
@@ -272,11 +328,36 @@ class InfoController
 
     }
 
+    /************************************************************************************************************************ */
     public function rentabilidadProductos(){
         return view('info.rentabilidadproductos');
     }
 
     public function rentabilidadProductosGenerar(Request $request){
+        //Verificar con validator
+        $data = $this->validarFechas($request);
+        if (!$data) {
+            $message = "Error en Fechas ingresadas";
+            $url = url()->previous();
+            return view('error', compact('message', 'url'));
+        }
+        $fechaInicio = $data['fechaInicio'];
+        $fechaFin = $data['fechaTermino'];
+
+        // Comparar las fechas
+        if (strtotime($fechaFin) < strtotime($fechaInicio)) {
+            // Redirigir de vuelta con un mensaje de error
+            return redirect()->back()->withErrors([
+                'fechaTermino' => 'La fecha de término debe ser mayor o igual a la fecha de inicio.',
+            ])->withInput();
+        }
+
+        $productos = $this->productoController->rentabilidadProductos($fechaInicio,$fechaFin);
+        return view('info.rentabilidadproductosresult', compact('fechaInicio', 'fechaFin', 'productos'));
+
+    }
+
+    public function rentabilidadProductosGenerarExcel(Request $request){
         //Verificar con validator
         $data = $this->validarFechas($request);
         if (!$data) {
